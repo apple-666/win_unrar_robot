@@ -1,0 +1,86 @@
+@echo off
+REM 设置CMD代码页为GBK（936），确保中文正确显示
+chcp 936 >nul 2>&1
+setlocal enabledelayedexpansion
+
+echo ============================================
+echo 自动解压机器人 - 第一阶段
+echo ============================================
+
+REM 配置
+set "SOURCE_PATH=E:\tool\win_rar_auto\test\game_src"
+set "WINRAR_PATH=D:\apple\software\WinRAR.exe"
+
+echo [配置检查]
+echo 源路径: !SOURCE_PATH!
+echo WinRAR: !WINRAR_PATH!
+
+REM 检查路径
+if not exist "!SOURCE_PATH!" (
+    echo 错误: 源路径不存在
+    goto :end
+)
+
+if not exist "!WINRAR_PATH!" (
+    echo 错误: WinRAR不存在
+    goto :end
+)
+
+echo 路径检查通过
+
+REM 切换目录
+echo 切换到: !SOURCE_PATH!
+cd /d "!SOURCE_PATH!" 2>nul
+if errorlevel 1 (
+    echo 错误: 无法切换目录
+    goto :end
+)
+
+echo 开始扫描文件...
+
+REM 第一步：jpg转换
+echo 步骤1: jpg转换
+set "jpg_count=0"
+for /r %%f in (*.jpg) do (
+    if exist "%%f" (
+        set /a jpg_count+=1
+        echo 转换: %%~nxf
+        ren "%%f" "%%~nf.zip" >nul 2>&1
+    )
+)
+echo 处理了 !jpg_count! 个jpg文件
+
+REM 第二步：解压rar
+echo 步骤2: 解压rar
+set "rar_count=0"
+set "processed=0"
+
+for /r %%f in (*.rar) do (
+    if exist "%%f" (
+        set /a rar_count+=1
+        set "rar_name=%%~nxf"
+
+        REM 跳过分卷
+        echo !rar_name! | findstr /R "\.part[2-9]" >nul
+        if !errorlevel! equ 0 (
+            echo 跳过分卷: !rar_name!
+        ) else (
+            echo 处理: !rar_name!
+
+            REM 尝试解压
+            "!WINRAR_PATH!" x -y -o+ -p- "%%f" "." >nul 2>&1
+            if !errorlevel! equ 0 (
+                echo 成功解压: !rar_name!
+                set /a processed+=1
+            ) else (
+                echo 解压失败: !rar_name!
+            )
+        )
+    )
+)
+
+echo 结果: 找到 !rar_count! 个rar文件，成功 !processed! 个
+
+:end
+echo 调试完成
+pause

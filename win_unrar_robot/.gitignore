@@ -1,0 +1,37 @@
+# 临时文件和日志
+*.log
+*.tmp
+*.temp
+*~
+
+# Windows系统文件
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# 输出目录（可根据需要保留）
+out/*
+!out/.gitkeep
+
+# 临时脚本文件
+check_*.ps1
+delete_*.ps1
+test_*.bat
+debug_*.bat
+
+# 备份文件
+backup/
+*.bak
+*_backup.*
+
+# 用户配置（如果不想上传个人配置）
+# scripts/auto_unzip_robot.bat
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+*.lnk
